@@ -13,9 +13,9 @@ import java.time.LocalDate;
 @Builder
 @Entity
 @Table(name = "confirmed_user", indexes = {
-        @Index(name = "idx_confirmeduser_address", columnList = "address, given_date, expire_date")
+        @Index(name = "idx_confirmed_user_address", columnList = "address, given_date, expire_date")
 }, uniqueConstraints = {
-        @UniqueConstraint(name = "uc_confirmeduser", columnNames = {"auth_user_id", "id_card_number"})
+        @UniqueConstraint(name = "uc_confirmed_user", columnNames = {"auth_user_id", "id_card_number"})
 })
 public class ConfirmedUser {
     @Id

@@ -18,7 +18,7 @@ import java.util.Set;
 @Entity
 @Table(name = "auth_user",
         indexes = {
-        @Index(name = "idx_authuser_birthdate", columnList = "birthdate, address, location")
+        @Index(name = "idx_auth_user_birthdate", columnList = "birthdate")
 }, uniqueConstraints = {
         @UniqueConstraint(name = "uc_authuser_id_card_number", columnNames = {"phone_number", "email", "main_card_id"})
 })
@@ -85,12 +85,15 @@ public class AuthUser {
     @JoinColumn(name = "main_card_id")
     private Card mainCard;
 
-    @OneToMany(mappedBy = "authUsers",
+    @OneToMany(mappedBy = "authUser",
     cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private Set<Initialized> initialized;
 
     @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     private Set<Card> cards;
+
+    @OneToOne(mappedBy = "authUser")
+    private ConfirmCode code;
 
     @NotBlank
     private String password;

@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import com.example.demo.configuration.MyApplicationListener;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
@@ -7,6 +8,7 @@ import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.boot.SpringApplication;
@@ -16,13 +18,18 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.scheduling.annotation.EnableAsync;
 import io.swagger.v3.oas.models.OpenAPI;
+import org.springframework.web.bind.annotation.RequestParam;
+
 import java.time.LocalDateTime;
 import java.util.TimeZone;
 
 @Slf4j
 @EnableAsync
 @SpringBootApplication
+@RequiredArgsConstructor
 public class DemoApplication {
+	private final MyApplicationListener myApplicationListener;
+
 	@PostConstruct
 	public void init(){
 		TimeZone.setDefault(TimeZone.getTimeZone("Asia/Tashkent"));
@@ -58,20 +65,19 @@ public class DemoApplication {
 				.contact(new Contact().name("Soliyev Boburjon")
 						.email("soliyevboburjon95@gmail.com")
 						.url("http://localhost:8080"))
-				.license(new License().name("License of API").url("API license URL"));
+				.license(new License().name("License of API").url(myApplicationListener.hostName));
 	}
 	@Bean
 	public GroupedOpenApi admin(){
 		return GroupedOpenApi.builder()
-				.group("Admin")
 				.pathsToMatch(
 						"/*"
-				).build();
+				).group("admin")
+				.build();
 	}
 	@Bean
 	public GroupedOpenApi user(){
 		return GroupedOpenApi.builder()
-				.group("User")
 				.pathsToMatch(
 						"/api.auth/register/*",
 						"/api.auth/login-1",
@@ -90,6 +96,6 @@ public class DemoApplication {
 						"/api.service-types/get/*",
 						"/api.transaction/create/*",
 						"/api.transaction/get/*"
-				).build();
+				).group("user").build();
 	}
 }

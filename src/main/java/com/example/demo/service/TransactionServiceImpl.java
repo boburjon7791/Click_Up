@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.example.demo.mappers.TransactionMapper.TRANSACTION_MAPPER;
+import static com.example.demo.utils.JwtTokenUtils.getEmail;
 
 @Slf4j
 @Service
@@ -37,7 +38,6 @@ public class TransactionServiceImpl implements TransactionService {
     private final AuthUserRepository authUserRepository;
     private final TransactionRepository transactionRepository;
     private final JavaMailSenderService javaMailSenderService;
-    private final JwtTokenUtils jwtTokenUtils;
 
     @Override
     public String getFullName(String number){
@@ -80,7 +80,7 @@ public class TransactionServiceImpl implements TransactionService {
         Transaction transaction = transactionRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Transaction not found"));
         String authorization = request.getHeader("Authorization");
-        String email = jwtTokenUtils.getEmail(authorization);
+        String email = getEmail(authorization);
         AuthUser authUser = authUserRepository.findByEmailAndActiveTrue(email)
                 .orElseThrow(() -> new NotFoundException("User not found"));
         if (!transaction.getConfirmCode().equals(confirmCode)) {

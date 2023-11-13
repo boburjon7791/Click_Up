@@ -4,6 +4,7 @@ import com.example.demo.entities.Card;
 import com.github.javafaker.Bool;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Repository;
@@ -20,9 +21,13 @@ public interface CardRepository extends JpaRepository<Card, Long>, JpaSpecificat
     Optional<Card> findByNumber(String number);
 
     @Transactional
+    @Modifying
+    @Query(value = "update Card c set c.active=true where c.number=?1")
     void updateActiveTrueByNumber(String number);
 
     @Transactional
+    @Modifying
+    @Query(value = "update Card c set c.active=false where c.number=?1")
     void updateActiveFalseByNumber(String number);
 
     @Query(value = "from Card c where c.authUser.id=?1")

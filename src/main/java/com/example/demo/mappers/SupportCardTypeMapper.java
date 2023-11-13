@@ -17,10 +17,14 @@ import java.util.List;
 public interface SupportCardTypeMapper {
     SupportCardTypeMapper SUPPORT_CARD_TYPE_MAPPER = Mappers.getMapper(SupportCardTypeMapper.class);
 
+    @Mapping(target = "id",ignore = true)
+    @Mapping(target = "enable",ignore = true)
     SupportCardType toEntity(CardTypeCreateDto dto);
+
+    @Mapping(target = "id",ignore = true)
+    @Mapping(target = "enable",ignore = true)
     SupportCardType toEntity(CardTypeUpdateDto dto);
 
-    @Mapping(target = "restApi", ignore = true)
     CardTypeGetDto toDto(SupportCardType supportCardType);
     default Page<CardTypeGetDto> toDto(Page<SupportCardType> cardTypes){
         if (cardTypes==null || cardTypes.isEmpty()) {

@@ -9,7 +9,6 @@ import com.example.demo.repositories.AuthUserRepository;
 import com.example.demo.repositories.ConfirmCodeRepository;
 import com.example.demo.repositories.ConfirmedUserRepository;
 import com.example.demo.repositories.RoleRepository;
-import com.example.demo.utils.JwtTokenUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +25,7 @@ import java.util.stream.Collectors;
 
 import static com.example.demo.mappers.AuthUserMapper.AUTH_USER_MAPPER;
 import static com.example.demo.mappers.ConfirmedUserMapper.CONFIRMED_USER_MAPPER;
+import static com.example.demo.utils.JwtTokenUtils.*;
 
 @Slf4j
 @Service
@@ -36,7 +36,6 @@ public class AuthUserServiceImpl implements AuthUserService {
     private final AuthUserRepository authUserRepository;
     private final JavaMailSenderService javaMailSenderService;
     private final PasswordEncoder passwordEncoder;
-    private final JwtTokenUtils jwtTokenUtils;
     private final RoleRepository roleRepository;
 
     @Override
@@ -71,7 +70,7 @@ public class AuthUserServiceImpl implements AuthUserService {
                 <h1>%s</h1>
                 """.formatted(confirmPassword);
         javaMailSenderService.send(authUser.getEmail(), message);
-        String encoded = jwtTokenUtils.encode(authUser.getEmail());
+        String encoded = encode(authUser.getEmail());
         response.setHeader("email", encoded);
     }
 
@@ -79,8 +78,8 @@ public class AuthUserServiceImpl implements AuthUserService {
     public AuthUserGetDto login2(String confirmCode, HttpServletRequest request, Long userId,
                                  String data, HttpServletResponse response) {
         String encoded = request.getHeader("email");
-        String email = jwtTokenUtils.decode(encoded);
-        ConfirmCode confirmation = confirmCodeRepository.findByConfirmCode(confirmCode)
+        String email = decode(encoded);
+        ConfirmCode confirmation = confirmCodeRepository.findByConfirmPassword(Integer.parseInt(confirmCode))
                 .orElseThrow(()->new BadRequestException("Confirmation code is not correct"));
         AuthUser authUser = confirmation.getAuthUser();
         if (!authUser.getId().equals(userId) || !authUser.getEmail().equals(email)) {
@@ -100,6 +99,7 @@ public class AuthUserServiceImpl implements AuthUserService {
         authUser.setActive(true);
         authUserRepository.save(authUser);
         confirmCodeRepository.deleteById(userId);
+        response.setHeader("Authorization",generateToken(authUser.getEmail()));
         return AUTH_USER_MAPPER.toDto(authUser);
     }
 
@@ -190,7 +190,7 @@ public class AuthUserServiceImpl implements AuthUserService {
     @Override
     public AuthUserGetDto initialize(Short pinCode, HttpServletRequest request) {
         String data = request.getHeader("Data");
-        String email = jwtTokenUtils.getEmail(request.getHeader("Authorization"));
+        String email = getEmail(request.getHeader("Authorization"));
         AuthUser authUser = authUserRepository.findByEmailAndActiveTrue(email)
                 .orElseThrow(() -> new NotFoundException("User not found"));
         Set<String> collect = authUser.getInitialized()

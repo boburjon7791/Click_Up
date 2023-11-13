@@ -13,7 +13,7 @@ import java.util.Set;
 @Builder
 @Entity
 @Table(name = "service", indexes = {
-        @Index(name = "idx_service_name_location_id", columnList = "name, location_id")
+        @Index(name = "idx_service_name_location_id", columnList = "name")
 }, uniqueConstraints = {
         @UniqueConstraint(name = "uc_service_name_restapi", columnNames = {"name", "rest_api", "bank_account"})
 })

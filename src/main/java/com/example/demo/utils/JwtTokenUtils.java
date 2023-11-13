@@ -26,12 +26,14 @@ public class JwtTokenUtils {
     @Value("${jwt.token-key}")
     private String key;
 
+    private static final String key2="awegsgsrhthEEQcf6465dth543135";
+
     @Value("${jwt.text-key}")
     private String textKey;
 
-    private final PasswordEncoder passwordEncoder;
+    private static final String textKey2="awegsgsrhthEEQcf643135";
 
-    public String encode(@NonNull  String text){
+    public static String encode(@NonNull  String text){
         Date date = new Date(System.currentTimeMillis()+1000*60*3);
         return Jwts.builder()
                 .setSubject(text)
@@ -41,7 +43,7 @@ public class JwtTokenUtils {
                 .signWith(textKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
-    public String decode(@NonNull String encodedText){
+    public static String decode(@NonNull String encodedText){
         Claims claims;
         try {
             claims=Jwts.parserBuilder()
@@ -57,12 +59,7 @@ public class JwtTokenUtils {
         }
         return claims.getSubject();
     }
-    public String generateToken(@NonNull String username, String password){
-        UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
-        String detailsPassword = userDetails.getPassword();
-        if (!passwordEncoder.matches(password, detailsPassword)) {
-            throw new BadRequestException("Password is not correct");
-        }
+    public static String generateToken(@NonNull String username){
         Date date = new Date(System.currentTimeMillis()+1000*60*60);
         String token;
         try {
@@ -78,11 +75,11 @@ public class JwtTokenUtils {
         }
         return token;
     }
-    public String getEmail(@NonNull String authorization) {
+    public static String getEmail(@NonNull String authorization) {
         Claims claims;
         try {
              claims = Jwts.parserBuilder()
-                    .setSigningKey(this.signinKey())
+                    .setSigningKey(signinKey())
                     .build()
                     .parseClaimsJws(authorization)
                     .getBody();
@@ -95,20 +92,20 @@ public class JwtTokenUtils {
         }
         return claims.getSubject();
     }
-    private Key signinKey(){
-        byte[] decode = Decoders.BASE64.decode(this.key);
+    private static Key signinKey(){
+        byte[] decode = Decoders.BASE64.decode(key2);
         return Keys.hmacShaKeyFor(decode);
     }
-    private Key textKey(){
-        byte[] decode = Decoders.BASE64.decode(this.textKey);
+    private static Key textKey(){
+        byte[] decode = Decoders.BASE64.decode(textKey2);
         return Keys.hmacShaKeyFor(decode);
     }
 
-    public boolean isValid(String authorization) {
+    public static boolean isValid(String authorization) {
         Claims claims;
         try {
             claims = Jwts.parserBuilder()
-                    .setSigningKey(this.signinKey())
+                    .setSigningKey(signinKey())
                     .build()
                     .parseClaimsJws(authorization)
                     .getBody();

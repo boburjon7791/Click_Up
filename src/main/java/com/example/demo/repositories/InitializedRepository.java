@@ -1,5 +1,7 @@
-package com.example.demo.entities;
+package com.example.demo.repositories;
 
+import com.example.demo.entities.AuthUser;
+import com.example.demo.entities.Initialized;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;

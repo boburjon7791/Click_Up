@@ -12,7 +12,7 @@ import java.util.Set;
 @Setter
 @Builder
 @Entity
-@Table
+@Table(name = "location")
 public class Location {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

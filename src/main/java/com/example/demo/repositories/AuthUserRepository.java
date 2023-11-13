@@ -30,9 +30,13 @@ public interface AuthUserRepository extends JpaRepository<AuthUser, Long>, JpaSp
     Boolean existsByEmail(String email);
 
     @Transactional
+    @Modifying
+    @Query(value = "update AuthUser u set u.active=true where u.id=?1")
     void updateActiveTrueById(Long id);
 
     @Transactional
+    @Modifying
+    @Query(value = "update AuthUser u set u.active=false  where u.id=?1")
     void updateActiveFalseById(Long id);
 
     Boolean existsByPhoneNumber(String phone);

@@ -4,9 +4,10 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
-@Table(name = "ConfirmCode", indexes = {
+@Table(name = "confirm_code", indexes = {
         @Index(name = "idx_confirmcode", columnList = "confirm_password, expire_time")
 })
 @AllArgsConstructor
@@ -17,6 +18,10 @@ import java.time.LocalDateTime;
 @ToString
 public class ConfirmCode {
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
+    @JoinColumn(name = "auth_user_id",nullable = false)
     @OneToOne(fetch = FetchType.EAGER)
     private AuthUser authUser;
 

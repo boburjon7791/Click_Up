@@ -21,9 +21,11 @@ public interface TransactionMapper {
     @Mapping(target = "toCard", ignore = true)
     @Mapping(target = "service", ignore = true)
     @Mapping(target = "confirmCode", ignore = true)
+    @Mapping(target = "expireTimeConfirmation", ignore = true)
     Transaction toEntity(TransactionDto dto);
 
     @Mapping(target = "fromCardNumber", ignore = true)
+    @Mapping(target = "toCardNumber",ignore = true)
     @Mapping(target = "fromUserId", ignore = true)
     @Mapping(target = "toUserId", ignore = true)
     @Mapping(target = "serviceId", ignore = true)

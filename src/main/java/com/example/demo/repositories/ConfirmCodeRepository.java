@@ -14,7 +14,7 @@ import java.util.Optional;
 
 @Repository
 public interface ConfirmCodeRepository extends JpaRepository<ConfirmCode, AuthUser>, JpaSpecificationExecutor<ConfirmCode> {
-    Optional<ConfirmCode> findByConfirmCode(String confirmCode);
+    Optional<ConfirmCode> findByConfirmPassword(Integer confirmCode);
 
     @Modifying
     @Transactional

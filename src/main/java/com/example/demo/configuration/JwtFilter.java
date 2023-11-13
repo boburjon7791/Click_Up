@@ -19,12 +19,14 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+import static com.example.demo.utils.JwtTokenUtils.getEmail;
+import static com.example.demo.utils.JwtTokenUtils.isValid;
+
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
     private final CustomUserDetailsService customUserDetailsService;
-    private final JwtTokenUtils jwtTokenUtils;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
@@ -38,11 +40,11 @@ public class JwtFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-        if(!jwtTokenUtils.isValid(authorization)){
+        if(!isValid(authorization)){
             filterChain.doFilter(request, response);
             return;
         }
-        String email = jwtTokenUtils.getEmail(authorization);
+        String email = getEmail(authorization);
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, null, userDetails.getAuthorities());
         WebAuthenticationDetails details = new WebAuthenticationDetails(request);

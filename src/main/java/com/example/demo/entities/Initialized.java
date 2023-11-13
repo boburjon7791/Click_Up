@@ -3,6 +3,8 @@ package com.example.demo.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.UUID;
+
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -13,7 +15,11 @@ import lombok.*;
 @Table(name = "initialized")
 public class Initialized {
     @Id
-    @ManyToOne
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
+    @ManyToOne()
+    @JoinColumn(name = "auth_user_id",updatable = false)
     private AuthUser authUser;
 
     @Column(nullable = false)

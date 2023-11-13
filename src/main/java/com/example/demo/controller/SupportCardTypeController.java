@@ -46,7 +46,7 @@ public class SupportCardTypeController {
         return ResponseEntity.noContent().build();
     }
     @PreAuthorize("isAuthenticated()")
-    @GetMapping("/get-all")
+    @GetMapping("/get-all-cards")
     public ResponseEntity<Page<CardTypeGetDto>> getAll(@RequestParam Integer page){
         Page<CardTypeGetDto> cardTypes = supportCardTypeService.cardTypes(PageRequest.of(page, 10));
         return ResponseEntity.ok(cardTypes);

@@ -20,13 +20,14 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static com.example.demo.utils.JwtTokenUtils.getEmail;
+
 @RestController
 @RequiredArgsConstructor
 @PreAuthorize("hasAnyAuthority('ADMIN')")
 @RequestMapping("/api.card")
 public class CardController {
     private final CardService cardService;
-    private final JwtTokenUtils jwtTokenUtils;
     private final AuthUserRepository authUserRepository;
     private final SupportBankRepository supportBankRepository;
     private final SupportCardTypeRepository supportCardTypeRepository;
@@ -58,7 +59,7 @@ public class CardController {
     @PutMapping("/disable/{numberBase64}")
     public ResponseEntity<Void> disable(@PathVariable String numberBase64, HttpServletRequest request){
         String decoded = decode(numberBase64);
-        String email = jwtTokenUtils.getEmail(request.getHeader("Authorization"));
+        String email = getEmail(request.getHeader("Authorization"));
         if(!authUserRepository.existsThisCardInUserAndUserActiveTrue(email, decoded)){
             throw new ForbiddenAccessException("You can not disable this %s card".formatted(decoded));
         }

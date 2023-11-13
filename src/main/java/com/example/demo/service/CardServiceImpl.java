@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.example.demo.mappers.CardMapper.CARD_MAPPER;
+import static com.example.demo.utils.JwtTokenUtils.getEmail;
 
 @Slf4j
 @Service
@@ -28,12 +29,11 @@ public class CardServiceImpl implements CardService {
     private final SupportBankRepository supportBankRepository;
     private final SupportCardTypeRepository supportCardTypeRepository;
     private final CardRepository cardRepository;
-    private final JwtTokenUtils jwtTokenUtils;
 
     @Override
     public CardGetDto create(CardCreateDto dto, HttpServletRequest request) {
         String authorization = request.getHeader("Authorization");
-        String email = jwtTokenUtils.getEmail(authorization);
+        String email = getEmail(authorization);
         if (cardRepository.existsByNumberAndUserEquals(dto.number, email)) {
             Runnable runnable = ()-> cardRepository.updateActiveTrueByNumber(dto.number);
             runnable.run();
