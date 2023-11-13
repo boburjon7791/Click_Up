@@ -71,7 +71,7 @@ public class DemoApplication {
 	public GroupedOpenApi admin(){
 		return GroupedOpenApi.builder()
 				.pathsToMatch(
-						"/*"
+						"/**"
 				).group("admin")
 				.build();
 	}
@@ -79,23 +79,23 @@ public class DemoApplication {
 	public GroupedOpenApi user(){
 		return GroupedOpenApi.builder()
 				.pathsToMatch(
-						"/api.auth/register/*",
+						"/api.auth/register/**",
 						"/api.auth/login-1",
 						"/api.auth/login-2",
-						"/api.auth/logout/*",
-						"/api.auth/get/*",
-						"/api.auth/create/*",
-						"/api.auth/initialize/*",
+						"/api.auth/logout/**",
+						"/api.auth/get/**",
+						"/api.auth/create/**",
+						"/api.auth/initialize/**",
 						"/api.card/create",
-						"/api.card/get/*",
-						"/api.card/disable/*",
-						"/api.card/my-cards/*",
-						"/api.location/get/*",
-						"/api.role/get/*",
-						"/api.services/get/*",
-						"/api.service-types/get/*",
-						"/api.transaction/create/*",
-						"/api.transaction/get/*"
+						"/api.card/get/**",
+						"/api.card/disable/**",
+						"/api.card/my-cards/**",
+						"/api.location/get/**",
+						"/api.role/get/**",
+						"/api.services/get/**",
+						"/api.service-types/get/**",
+						"/api.transaction/create/**",
+						"/api.transaction/get/**"
 				).group("user").build();
 	}
 }

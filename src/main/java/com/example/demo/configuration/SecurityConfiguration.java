@@ -40,14 +40,7 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http.csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(registry -> {
-                    registry.requestMatchers(
-                            "/swagger-ui.html",
-                            "/swagger-ui/*",
-                            "/api/*",
-                            "/v3/*","/v1/*","/v2/*").permitAll();
-                    registry.anyRequest().authenticated();
-                })
+                .authorizeHttpRequests(registry -> registry.anyRequest().permitAll())
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(entryPoint()))
                 .exceptionHandling(exception -> exception.accessDeniedHandler(accessDeniedHandler()))
                 .sessionManagement(configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
