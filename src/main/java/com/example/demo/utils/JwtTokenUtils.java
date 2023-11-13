@@ -103,4 +103,19 @@ public class JwtTokenUtils {
         byte[] decode = Decoders.BASE64.decode(this.textKey);
         return Keys.hmacShaKeyFor(decode);
     }
+
+    public boolean isValid(String authorization) {
+        Claims claims;
+        try {
+            claims = Jwts.parserBuilder()
+                    .setSigningKey(this.signinKey())
+                    .build()
+                    .parseClaimsJws(authorization)
+                    .getBody();
+            System.out.println(authorization);
+        }catch (Exception e){
+            throw new UnauthorizedException();
+        }
+        return claims.getExpiration().after(new Date());
+    }
 }
