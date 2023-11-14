@@ -18,7 +18,6 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.scheduling.annotation.EnableAsync;
 import io.swagger.v3.oas.models.OpenAPI;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDateTime;
 import java.util.TimeZone;
@@ -80,6 +79,7 @@ public class DemoApplication {
 		return GroupedOpenApi.builder()
 				.pathsToMatch(
 						"/api.auth/register/**",
+						"/api.auth/activate/**",
 						"/api.auth/login-1",
 						"/api.auth/login-2",
 						"/api.auth/logout/**",

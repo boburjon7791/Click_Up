@@ -27,9 +27,15 @@ public class AuthController {
     private final AuthUserRepository authUserRepository;
 
     @PostMapping("/register")
-    public ResponseEntity<Void> register(@RequestBody AuthUserCreateDto dto){
-        authUserService.register(dto);
+    public ResponseEntity<Void> register(@RequestBody AuthUserCreateDto dto, HttpServletResponse response){
+        authUserService.register(dto,response);
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+    @PutMapping("/activate/account/{email}")
+    public ResponseEntity<Void> activateAccount(HttpServletRequest request,
+                                                @PathVariable String email){
+        authUserService.activateNewAccount(request, email);
+        return ResponseEntity.noContent().build();
     }
     @GetMapping("/login-1")
     public ResponseEntity<Void> login1(@RequestBody LoginDto loginDto,

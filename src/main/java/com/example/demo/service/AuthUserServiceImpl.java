@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -39,7 +40,7 @@ public class AuthUserServiceImpl implements AuthUserService {
     private final RoleRepository roleRepository;
 
     @Override
-    public void register(AuthUserCreateDto dto) {
+    public void register(AuthUserCreateDto dto, HttpServletResponse response) {
         if(authUserRepository.existsByEmailOrPhoneNumber(dto.email, dto.phoneNumber)){
             throw new BadRequestException("Email or phone number already exist");
         }
@@ -50,6 +51,18 @@ public class AuthUserServiceImpl implements AuthUserService {
         authUser.setPinCode(encodedPinCode);
         AuthUser saved = authUserRepository.save(authUser);
         log.info("{} saved",saved);
+        response.setHeader("email",encode(saved.getEmail()));
+    }
+
+    @Override
+    public void activateNewAccount(HttpServletRequest request, String email) {
+        String encodedEmail = request.getHeader("email");
+        String decoded = decode(encodedEmail);
+        if (decoded.equals(email) && authUserRepository.existsByEmail(email)) {
+            authUserRepository.updateActiveTrueByEmail(email);
+            return;
+        }
+        throw new BadRequestException("Email incorrect");
     }
 
     @Override

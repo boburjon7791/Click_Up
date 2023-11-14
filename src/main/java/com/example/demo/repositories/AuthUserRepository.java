@@ -43,4 +43,9 @@ public interface AuthUserRepository extends JpaRepository<AuthUser, Long>, JpaSp
 
     @Query(value = "select exists (from AuthUser u where u.email=?1 and u.active=true and exists (from u.cards c where c.number=?2))")
     Boolean existsThisCardInUserAndUserActiveTrue(String email, String cardNumber);
+
+    @Query(value = "update AuthUser u set u.active=true where u.email=?1")
+    @Modifying
+    @Transactional
+    void updateActiveTrueByEmail(String email);
 }
