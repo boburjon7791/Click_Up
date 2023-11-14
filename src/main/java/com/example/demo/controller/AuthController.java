@@ -20,7 +20,7 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@PreAuthorize("isAuthenticated()")
+@PreAuthorize("permitAll()")
 @RequestMapping("/api.auth")
 public class AuthController {
     private final AuthUserService authUserService;

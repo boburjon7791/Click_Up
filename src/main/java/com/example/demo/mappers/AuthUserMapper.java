@@ -25,6 +25,7 @@ public interface AuthUserMapper {
     @Mapping(target = "cards",ignore = true)
     @Mapping(target = "pinCode",ignore = true)
     @Mapping(target = "initialized",ignore = true)
+    @Mapping(target = "code", ignore = true)
     AuthUser toEntity(AuthUserCreateDto dto);
 
     @Mapping(target = "confirmed",ignore = true)
@@ -36,6 +37,7 @@ public interface AuthUserMapper {
     @Mapping(target = "password",ignore = true)
     @Mapping(target = "pinCode",ignore = true)
     @Mapping(target = "initialized",ignore = true)
+    @Mapping(target = "code", ignore = true)
     AuthUser toEntity(AuthUserUpdateDto dto);
 
     @Mapping(target = "mainCard",ignore = true)
