@@ -15,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -38,12 +37,14 @@ public class AuthUserServiceImpl implements AuthUserService {
     private final JavaMailSenderService javaMailSenderService;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
+    private final MultimediaService multimediaService;
 
     @Override
     public void register(AuthUserCreateDto dto, HttpServletResponse response) {
         if(authUserRepository.existsByEmailOrPhoneNumber(dto.email, dto.phoneNumber)){
             throw new BadRequestException("Email or phone number already exist");
         }
+        multimediaService.existsImage(dto.profileImage);
         AuthUser authUser = AUTH_USER_MAPPER.toEntity(dto);
         String encodedPassword = passwordEncoder.encode(dto.password);
         String encodedPinCode = passwordEncoder.encode(dto.pinCode.toString());
@@ -66,15 +67,15 @@ public class AuthUserServiceImpl implements AuthUserService {
     }
 
     @Override
-    public void login1(LoginDto loginDto, HttpServletResponse response) {
-        AuthUser authUser = authUserRepository.findByEmailAndActiveTrue(loginDto.email)
+    public void login1(Login login, HttpServletResponse response) {
+        AuthUser authUser = authUserRepository.findByEmailAndActiveTrue(login.email)
                 .orElseThrow(() -> new NotFoundException("This email was not signed up"));
-        if (!passwordEncoder.matches(loginDto.password, authUser.getPassword())) {
+        if (!passwordEncoder.matches(login.password, authUser.getPassword())) {
             throw new BadRequestException("Incorrect password");
         }
         ConfirmCode confirmCode = ConfirmCode.builder()
                 .authUser(authUser)
-                .confirmPassword(new Random().nextInt(4, 6))
+                .confirmPassword(new Random().nextInt(10000, 99999))
                 .build();
         Integer confirmPassword = confirmCode.getConfirmPassword();
         String message = """
@@ -82,20 +83,26 @@ public class AuthUserServiceImpl implements AuthUserService {
                 <h3>Don't give anyone this confirmation code !!!</h3>
                 <h1>%s</h1>
                 """.formatted(confirmPassword);
+        System.out.println(message);
         javaMailSenderService.send(authUser.getEmail(), message);
         String encoded = encode(authUser.getEmail());
         response.setHeader("email", encoded);
+        Runnable runnable = ()->{
+            confirmCodeRepository.save(confirmCode);
+        };
+        runnable.run();
     }
 
     @Override
-    public AuthUserGetDto login2(String confirmCode, HttpServletRequest request, Long userId,
+    public AuthUserGetDto login2(String confirmCode, HttpServletRequest request,
                                  String data, HttpServletResponse response) {
         String encoded = request.getHeader("email");
         String email = decode(encoded);
+        System.out.println("confirmCode = " + confirmCode);
         ConfirmCode confirmation = confirmCodeRepository.findByConfirmPassword(Integer.parseInt(confirmCode))
                 .orElseThrow(()->new BadRequestException("Confirmation code is not correct"));
         AuthUser authUser = confirmation.getAuthUser();
-        if (!authUser.getId().equals(userId) || !authUser.getEmail().equals(email)) {
+        if (!authUser.getEmail().equals(email)) {
             throw new BadRequestException("User not found");
         }
         Set<Initialized> initializedSet = authUser.getInitialized();
@@ -111,7 +118,7 @@ public class AuthUserServiceImpl implements AuthUserService {
         authUserRepository.save(authUser);
         authUser.setActive(true);
         authUserRepository.save(authUser);
-        confirmCodeRepository.deleteById(userId);
+        confirmCodeRepository.deleteById(authUser.getId());
         response.setHeader("Authorization",generateToken(authUser.getEmail()));
         return AUTH_USER_MAPPER.toDto(authUser);
     }

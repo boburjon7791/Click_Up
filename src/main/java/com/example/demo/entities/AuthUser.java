@@ -38,7 +38,7 @@ public class AuthUser {
     @Column(name = "father_name")
     private String fatherName;
 
-    @NotBlank
+    @NotNull
     @Column(nullable = false)
     private LocalDate birthdate;
 
@@ -79,7 +79,7 @@ public class AuthUser {
     private Set<Role> roles;
 
     @Column(name = "profile_image")
-    private byte[] profileImage;
+    private String profileImage;
 
     @OneToOne
     @JoinColumn(name = "main_card_id")

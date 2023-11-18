@@ -8,7 +8,7 @@ import lombok.*;
 @Data
 @ToString
 @Builder
-public class LoginDto {
+public class Login {
     @NotBlank
     public String email;
 

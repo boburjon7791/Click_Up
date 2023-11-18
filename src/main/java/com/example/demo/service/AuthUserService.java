@@ -9,8 +9,8 @@ import org.springframework.data.domain.Pageable;
 public interface AuthUserService {
     void register(AuthUserCreateDto dto, HttpServletResponse response);
     void activateNewAccount(HttpServletRequest request, String email);
-    void login1(LoginDto loginDto, HttpServletResponse response);
-    AuthUserGetDto login2(String confirmCode, HttpServletRequest request, Long userId, String data, HttpServletResponse response);
+    void login1(Login login, HttpServletResponse response);
+    AuthUserGetDto login2(String confirmCode, HttpServletRequest request, String data, HttpServletResponse response);
     void logout(Long id, HttpServletRequest request, String data);
     AuthUserGetDto get(Long id);
     void enable(Long id);

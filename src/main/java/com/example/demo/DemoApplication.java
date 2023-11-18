@@ -1,6 +1,8 @@
 package com.example.demo;
 
 import com.example.demo.configuration.MyApplicationListener;
+import com.example.demo.repositories.AuthUserRepository;
+import com.example.demo.service.MultimediaService;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
@@ -14,20 +16,29 @@ import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.scheduling.annotation.EnableAsync;
 import io.swagger.v3.oas.models.OpenAPI;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.TimeZone;
 
 @Slf4j
 @EnableAsync
+@EnableScheduling
 @SpringBootApplication
 @RequiredArgsConstructor
 public class DemoApplication {
 	private final MyApplicationListener myApplicationListener;
+	private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+	private final MultimediaService multimediaService;
 
 	@PostConstruct
 	public void init(){
@@ -37,6 +48,13 @@ public class DemoApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(DemoApplication.class, args);
+	}
+	@Scheduled(cron = "0 0 * * * *")
+	public void images(){
+		RowMapper<String> rowMapper = BeanPropertyRowMapper.newInstance(String.class);
+		String sql = "select profile_image from auth_user";
+		List<String> images = namedParameterJdbcTemplate.query(sql, rowMapper);
+		multimediaService.deleteImagesIfExists(images);
 	}
 	@Bean
 	public JavaMailSender javaMailSender(){
@@ -78,6 +96,7 @@ public class DemoApplication {
 	public GroupedOpenApi user(){
 		return GroupedOpenApi.builder()
 				.pathsToMatch(
+						"/api.multimedia/**",
 						"/api.auth/register/**",
 						"/api.auth/activate/**",
 						"/api.auth/login-1",

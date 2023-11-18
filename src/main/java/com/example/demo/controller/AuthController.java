@@ -3,7 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.payloads.auth_user.AuthUserCreateDto;
 import com.example.demo.payloads.auth_user.AuthUserGetDto;
 import com.example.demo.payloads.auth_user.ConfirmedUserDto;
-import com.example.demo.payloads.auth_user.LoginDto;
+import com.example.demo.payloads.auth_user.Login;
 import com.example.demo.repositories.AuthUserRepository;
 import com.example.demo.service.AuthUserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,17 +39,18 @@ public class AuthController {
         return ResponseEntity.noContent().build();
     }
     @GetMapping("/login-1")
-    public ResponseEntity<Void> login1(@RequestBody LoginDto loginDto,
+    public ResponseEntity<Void> login1(@RequestParam Map<String, String> params,
                                        HttpServletResponse response){
-        authUserService.login1(loginDto, response);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        Login login = Login.builder().email(params.get("email")).password(params.get("password")).build();
+        authUserService.login1(login, response);
+        return ResponseEntity.noContent().build();
     }
     @GetMapping("/login-2")
     public ResponseEntity<AuthUserGetDto> login2(@RequestParam Map<String, String> params,
                                                  HttpServletRequest request,
                                                  HttpServletResponse response){
         AuthUserGetDto getDto = authUserService.login2(CardController.decode(params.get("confirmCode"))
-                , request, Long.parseLong(params.get("userId")), params.get("data"), response);
+                , request, params.get("data"), response);
         return ResponseEntity.ok(getDto);
     }
     @GetMapping("/logout")

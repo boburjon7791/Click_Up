@@ -26,15 +26,15 @@ public class JwtTokenUtils {
     @Value("${jwt.token-key}")
     private String key;
 
-    private static final String key2="awegsgsrhthEEQcf6465dth543135";
+    private static final String key2="awegsgsrhtawfejgeushgnkesjbfueajrnfjebhjfhnfkjesbfhjgesfkawrGUYIHGYTWFYUEHNAWJHBVGAWHDKJAWBHGHDGAWHKDJNesnbfvageuhjajbhdawhEEQcf6465dth543135";
 
     @Value("${jwt.text-key}")
     private String textKey;
 
-    private static final String textKey2="awegsgsrhthEEQcf643135";
+    private static final String textKey2="awegsgsrhthEEQAWHDJAWHJFHBWGHJDHAWKJBFHJAWHFKJANEBFHGEAHKJFNBAEHGDAEKFNBHJAEGFUJANEJHFGUEAFHBJHEGFUEJAFHAEHUKFHJEAFHKEHAFEHFKJBSEJFHEUSKcf643135";
 
     public static String encode(@NonNull  String text){
-        Date date = new Date(System.currentTimeMillis()+1000*60*3);
+        Date date = new Date(System.currentTimeMillis()+1000*60*15);
         return Jwts.builder()
                 .setSubject(text)
                 .setIssuer("Click Up")
@@ -52,6 +52,7 @@ public class JwtTokenUtils {
                     .parseClaimsJws(encodedText)
                     .getBody();
         }catch (Exception e){
+            e.printStackTrace();
             throw new BadRequestException("Incorrect text");
         }
         if (claims.getExpiration().before(new Date())) {

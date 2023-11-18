@@ -21,7 +21,6 @@ public interface AuthUserMapper {
     @Mapping(target = "active",ignore = true)
     @Mapping(target = "roles",ignore = true)
     @Mapping(target = "mainCard",ignore = true)
-    @Mapping(target = "profileImage",ignore = true)
     @Mapping(target = "cards",ignore = true)
     @Mapping(target = "pinCode",ignore = true)
     @Mapping(target = "initialized",ignore = true)
@@ -32,7 +31,6 @@ public interface AuthUserMapper {
     @Mapping(target = "active",ignore = true)
     @Mapping(target = "roles",ignore = true)
     @Mapping(target = "mainCard",ignore = true)
-    @Mapping(target = "profileImage",ignore = true)
     @Mapping(target = "cards",ignore = true)
     @Mapping(target = "password",ignore = true)
     @Mapping(target = "pinCode",ignore = true)
@@ -43,7 +41,6 @@ public interface AuthUserMapper {
     @Mapping(target = "mainCard",ignore = true)
     @Mapping(target = "cards",ignore = true)
     @Mapping(target = "roles",ignore = true)
-    @Mapping(target = "profileImage",ignore = true)
     AuthUserGetDto toDto(AuthUser user);
 
     default Page<AuthUserGetDto> toDto(Page<AuthUser> authUsers){
