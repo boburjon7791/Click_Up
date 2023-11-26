@@ -60,6 +60,7 @@ public class SecurityConfiguration {
                     .build();
             response.setStatus(errorDto.code);
             objectMapper.writeValue(outputStream, errorDto);
+            outputStream.close();
         };
     }
     @Bean
@@ -75,6 +76,7 @@ public class SecurityConfiguration {
                     .build();
             response.setStatus(errorDto.code);
             objectMapper.writeValue(outputStream, errorDto);
+            outputStream.close();
         };
     }
     @Bean
