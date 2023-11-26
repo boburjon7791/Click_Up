@@ -58,6 +58,7 @@ public class SecurityConfiguration {
                     .message(message)
                     .uri(requestURI)
                     .build();
+            response.setStatus(errorDto.code);
             objectMapper.writeValue(outputStream, errorDto);
         };
     }
@@ -72,6 +73,7 @@ public class SecurityConfiguration {
                     .code(403)
                     .message(message)
                     .build();
+            response.setStatus(errorDto.code);
             objectMapper.writeValue(outputStream, errorDto);
         };
     }
