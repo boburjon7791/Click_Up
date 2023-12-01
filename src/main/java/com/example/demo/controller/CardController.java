@@ -10,6 +10,7 @@ import com.example.demo.service.CardService;
 import com.example.demo.utils.JwtTokenUtils;
 import io.jsonwebtoken.io.Decoders;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,7 +35,7 @@ public class CardController {
 
     @PostMapping("/create")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<CardGetDto> create(@RequestBody CardCreateDto dto,
+    public ResponseEntity<CardGetDto> create(@RequestBody @Valid CardCreateDto dto,
                                              HttpServletRequest request){
         CardGetDto getDto = cardService.create(dto,request);
         return new ResponseEntity<>(getDto, HttpStatus.CREATED);

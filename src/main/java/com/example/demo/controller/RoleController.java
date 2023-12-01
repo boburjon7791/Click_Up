@@ -4,6 +4,7 @@ import com.example.demo.payloads.role.RoleCreateDto;
 import com.example.demo.payloads.role.RoleGetDto;
 import com.example.demo.payloads.role.RoleUpdateDto;
 import com.example.demo.service.RoleService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,13 +22,13 @@ public class RoleController {
     private final RoleService roleService;
 
     @PostMapping("/create")
-    public ResponseEntity<RoleGetDto> create(@RequestBody RoleCreateDto dto){
+    public ResponseEntity<RoleGetDto> create(@RequestBody @Valid RoleCreateDto dto){
         RoleGetDto getDto = roleService.create(dto);
         return new ResponseEntity<>(getDto, HttpStatus.CREATED);
     }
 
     @PutMapping("/update")
-    public ResponseEntity<RoleGetDto> update(@RequestBody RoleUpdateDto dto){
+    public ResponseEntity<RoleGetDto> update(@RequestBody @Valid RoleUpdateDto dto){
         RoleGetDto getDto = roleService.update(dto);
         return new ResponseEntity<>(getDto, HttpStatus.NO_CONTENT);
     }

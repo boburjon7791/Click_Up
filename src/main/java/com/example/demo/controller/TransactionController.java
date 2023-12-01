@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.payloads.transaction.TransactionDto;
 import com.example.demo.service.TransactionService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,7 +31,7 @@ public class TransactionController {
     }
 
     @PostMapping("/create/1")
-    public ResponseEntity<UUID> create(@RequestBody TransactionDto dto){
+    public ResponseEntity<UUID> create(@RequestBody @Valid TransactionDto dto){
         UUID transactionId = transactionService.create(dto);
         return new ResponseEntity<>(transactionId, HttpStatus.CREATED);
     }

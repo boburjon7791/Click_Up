@@ -4,6 +4,7 @@ import com.example.demo.payloads.card_type.CardTypeCreateDto;
 import com.example.demo.payloads.card_type.CardTypeGetDto;
 import com.example.demo.payloads.card_type.CardTypeUpdateDto;
 import com.example.demo.service.SupportCardTypeService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,12 +21,12 @@ public class SupportCardTypeController {
     private final SupportCardTypeService supportCardTypeService;
 
     @PostMapping("/create")
-    public ResponseEntity<CardTypeGetDto> create(@RequestBody CardTypeCreateDto dto){
+    public ResponseEntity<CardTypeGetDto> create(@RequestBody @Valid CardTypeCreateDto dto){
         CardTypeGetDto getDto = supportCardTypeService.create(dto);
         return new ResponseEntity<>(getDto, HttpStatus.CREATED);
     }
     @PutMapping("/update")
-    public ResponseEntity<CardTypeGetDto> update(@RequestBody CardTypeUpdateDto dto){
+    public ResponseEntity<CardTypeGetDto> update(@RequestBody @Valid CardTypeUpdateDto dto){
         CardTypeGetDto getDto = supportCardTypeService.update(dto);
         return new ResponseEntity<>(getDto, HttpStatus.NO_CONTENT);
     }

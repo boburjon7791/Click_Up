@@ -4,6 +4,7 @@ import com.example.demo.payloads.service.ServiceCreateDto;
 import com.example.demo.payloads.service.ServiceGetDto;
 import com.example.demo.payloads.service.ServiceUpdateDto;
 import com.example.demo.service.ServiceCreatorService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
@@ -22,12 +23,12 @@ public class ServiceCreatorController {
     private final ServiceCreatorService serviceCreatorService;
 
     @PostMapping("/create")
-    public ResponseEntity<ServiceGetDto> create(@RequestBody ServiceCreateDto dto){
+    public ResponseEntity<ServiceGetDto> create(@RequestBody @Valid ServiceCreateDto dto){
         ServiceGetDto getDto = serviceCreatorService.create(dto);
         return new ResponseEntity<>(getDto, HttpStatus.CREATED);
     }
     @PutMapping("/update")
-    public ResponseEntity<ServiceGetDto> update(@RequestBody ServiceUpdateDto dto){
+    public ResponseEntity<ServiceGetDto> update(@RequestBody @Valid ServiceUpdateDto dto){
         ServiceGetDto getDto = serviceCreatorService.update(dto);
         return new ResponseEntity<>(getDto, HttpStatus.NO_CONTENT);
     }

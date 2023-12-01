@@ -8,12 +8,12 @@ import com.example.demo.repositories.AuthUserRepository;
 import com.example.demo.service.AuthUserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,7 +28,7 @@ public class AuthController {
     private final AuthUserRepository authUserRepository;
 
     @PostMapping("/register")
-    public ResponseEntity<Void> register(@RequestBody AuthUserCreateDto dto, HttpServletResponse response){
+    public ResponseEntity<Void> register(@RequestBody @Valid AuthUserCreateDto dto, HttpServletResponse response){
         authUserService.register(dto,response);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
@@ -66,7 +66,7 @@ public class AuthController {
         return ResponseEntity.ok(getDto);
     }
     @PostMapping("/create/confirmed-user")
-    public ResponseEntity<ConfirmedUserDto> create(@RequestBody ConfirmedUserDto dto){
+    public ResponseEntity<ConfirmedUserDto> create(@RequestBody @Valid ConfirmedUserDto dto){
         ConfirmedUserDto userDto = authUserService.create(dto);
         return new ResponseEntity<>(userDto, HttpStatus.CREATED);
     }

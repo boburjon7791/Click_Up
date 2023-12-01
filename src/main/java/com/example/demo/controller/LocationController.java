@@ -4,6 +4,7 @@ import com.example.demo.payloads.location.LocationCreateDto;
 import com.example.demo.payloads.location.LocationGetDto;
 import com.example.demo.payloads.location.LocationUpdateDto;
 import com.example.demo.service.LocationService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,12 +20,12 @@ import org.springframework.web.bind.annotation.*;
 public class LocationController {
     private final LocationService locationService;
     @PostMapping("/create")
-    public ResponseEntity<LocationGetDto> create(@RequestBody LocationCreateDto dto){
+    public ResponseEntity<LocationGetDto> create(@RequestBody @Valid LocationCreateDto dto){
         LocationGetDto getDto = locationService.create(dto);
         return new ResponseEntity<>(getDto, HttpStatus.CREATED);
     }
     @PutMapping("/update")
-    public ResponseEntity<LocationGetDto> update(@RequestBody LocationUpdateDto dto){
+    public ResponseEntity<LocationGetDto> update(@RequestBody @Valid LocationUpdateDto dto){
         LocationGetDto getDto = locationService.update(dto);
         return new ResponseEntity<>(getDto, HttpStatus.NO_CONTENT);
     }

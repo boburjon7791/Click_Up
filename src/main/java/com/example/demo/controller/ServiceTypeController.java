@@ -4,6 +4,7 @@ import com.example.demo.payloads.service_type.ServiceTypeCreateDto;
 import com.example.demo.payloads.service_type.ServiceTypeGetDto;
 import com.example.demo.payloads.service_type.ServiceTypeUpdateDto;
 import com.example.demo.service.ServiceTypeCreatorService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,13 +21,13 @@ public class ServiceTypeController {
     private final ServiceTypeCreatorService serviceTypeCreatorService;
 
     @PostMapping("/create")
-    public ResponseEntity<ServiceTypeGetDto> create(@RequestBody ServiceTypeCreateDto dto){
+    public ResponseEntity<ServiceTypeGetDto> create(@RequestBody @Valid ServiceTypeCreateDto dto){
         ServiceTypeGetDto getDto = serviceTypeCreatorService.create(dto);
         return new ResponseEntity<>(getDto, HttpStatus.CREATED);
     }
 
     @PutMapping("/update")
-    public ResponseEntity<ServiceTypeGetDto> update(@RequestBody ServiceTypeUpdateDto dto){
+    public ResponseEntity<ServiceTypeGetDto> update(@RequestBody @Valid ServiceTypeUpdateDto dto){
         ServiceTypeGetDto getDto = serviceTypeCreatorService.update(dto);
         return new ResponseEntity<>(getDto, HttpStatus.NO_CONTENT);
     }

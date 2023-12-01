@@ -4,6 +4,7 @@ import com.example.demo.payloads.bank.SupportBankCreateDto;
 import com.example.demo.payloads.bank.SupportBankGetDto;
 import com.example.demo.payloads.bank.SupportBankUpdateDto;
 import com.example.demo.service.SupportBankService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,12 +21,12 @@ public class SupportBankController {
     private final SupportBankService supportBankService;
 
     @PostMapping("/create")
-    public ResponseEntity<SupportBankGetDto> create(@RequestBody SupportBankCreateDto dto){
+    public ResponseEntity<SupportBankGetDto> create(@RequestBody @Valid SupportBankCreateDto dto){
         SupportBankGetDto getDto = supportBankService.create(dto);
         return new ResponseEntity<>(getDto, HttpStatus.CREATED);
     }
     @PutMapping("/update")
-    public ResponseEntity<SupportBankGetDto> update(@RequestBody SupportBankUpdateDto dto){
+    public ResponseEntity<SupportBankGetDto> update(@RequestBody @Valid SupportBankUpdateDto dto){
         SupportBankGetDto getDto = supportBankService.update(dto);
         return new ResponseEntity<>(getDto, HttpStatus.NO_CONTENT);
     }
