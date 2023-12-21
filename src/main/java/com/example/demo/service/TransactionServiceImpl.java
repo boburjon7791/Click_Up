@@ -1,17 +1,11 @@
 package com.example.demo.service;
 
-import com.example.demo.entities.AuthUser;
-import com.example.demo.entities.Card;
 import com.example.demo.entities.Transaction;
-import com.example.demo.exceptions.BadRequestException;
-import com.example.demo.exceptions.ForbiddenAccessException;
 import com.example.demo.exceptions.NotFoundException;
 import com.example.demo.payloads.transaction.TransactionDto;
 import com.example.demo.repositories.AuthUserRepository;
 import com.example.demo.repositories.CardRepository;
-import com.example.demo.repositories.ServiceRepository;
 import com.example.demo.repositories.TransactionRepository;
-import com.example.demo.utils.JwtTokenUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,10 +13,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,7 +26,6 @@ import static com.example.demo.utils.JwtTokenUtils.getEmail;
 @Service
 @RequiredArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
-    private final ServiceRepository serviceRepository;
     private final CardRepository cardRepository;
     private final AuthUserRepository authUserRepository;
     private final TransactionRepository transactionRepository;
@@ -46,6 +38,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
+    @Transactional
     public UUID create(TransactionDto dto) {
         Transaction transaction = TRANSACTION_MAPPER.toEntity(dto);
         if (!authUserRepository.existsByIdAndActiveTrue(dto.fromUserId)) {
@@ -76,77 +69,42 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
+    @Transactional
     public Short create2(UUID id, HttpServletRequest request, Integer confirmCode){
         Transaction transaction = transactionRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Transaction not found"));
         String authorization = request.getHeader("Authorization");
         String email = getEmail(authorization);
-        AuthUser authUser = authUserRepository.findByEmailAndActiveTrue(email)
+        authUserRepository.findByEmailAndActiveTrue(email)
                 .orElseThrow(() -> new NotFoundException("User not found"));
-        if (!transaction.getConfirmCode().equals(confirmCode)) {
-            throw new BadRequestException("Confirmation code is not correct");
-        }
-        if (transaction.getExpireTimeConfirmation().isAfter(LocalDateTime.now())) {
-            throw new BadRequestException("Time out");
-        }
-        if (!transaction.getFromUser().getId().equals(authUser.getId())) {
-            throw new ForbiddenAccessException("User was not confirmed");
-        }
-        if (transaction.getFromCard().getExpireDate().isAfter(LocalDate.now())) {
-            throw new BadRequestException("Card %s expired".formatted(transaction.getFromCard()));
-        }
-        Card fromCard = transaction.getFromCard();
-        Double value = transaction.getSumma() + (transaction.getSumma() / 100) * transaction.getCommission();
-        if (fromCard.getBalance()<value) {
-            throw new BadRequestException("Balance is not enough");
-        }
-        fromCard.setBalance(fromCard.getBalance()-value);
+        RestTemplate restTemplate = new RestTemplate();
         if (transaction.getToUser().getId() != null) {
-            transaction.setToUser(authUserRepository.findByIdAndActiveTrue(transaction.getToUser().getId())
-                    .orElseThrow(() -> new NotFoundException("User %s not found"
-                            .formatted(transaction.getToUser().getId()))));
-            Card main = transaction.getToUser().getMainCard();
-            if (main.getActive().equals(false)) {
-                throw new BadRequestException("Card %s is not active".formatted(main));
-            }
-            main.setBalance(main.getBalance()+value);
-            transaction.setToCard(main);
-        } else if (transaction.getToCard().getNumber() != null) {
-            transaction.setToCard(cardRepository.findByNumberAndActiveTrue(transaction.getToCard().getNumber())
-                    .orElseThrow(() -> new NotFoundException("Card %s not found"
-                            .formatted(transaction.getToCard().getNumber()))));
-            if (transaction.getToCard().getExpireDate().isAfter(LocalDate.now())) {
-                throw new BadRequestException("Card %s expired".formatted(transaction.getFromCard()));
-            }
-            Card toCard = transaction.getToCard();
-            if (toCard.getActive().equals(false)) {
-                throw new BadRequestException("Card %s is not active".formatted(toCard));
-            }
-            toCard.setBalance(toCard.getBalance()+value);
+            transactionRepository.transactionCreate2WithToUser(id,confirmCode);
+        }else if (transaction.getToCard().getNumber() != null) {
+            transactionRepository.transactionCreate2WithToCard(id,confirmCode);
         } else if (transaction.getService().getId() != null) {
-            transaction.setService(serviceRepository.findByIdAndEnableTrue(transaction.getService().getId())
-                    .orElseThrow(() -> new NotFoundException("Service %s not found"
-                            .formatted(transaction.getService().getId()))));
-            com.example.demo.entities.Service service = transaction.getService();
-            String restApi = service.getRestApi();
-            RestTemplate restTemplate = new RestTemplate();
+            transactionRepository.transactionCreate2WithToService(id,confirmCode);
+            Transaction tr = transactionRepository.findById(id)
+                    .orElseThrow(() -> new NotFoundException("Error"));
+            restTemplate.put(tr.getService().getRestApi(),tr.getSumma());
             /*
              * Here we need to warn created transaction service with its restApi
              * */
         } else if(transaction.getBankAccount()!=null) {
-            RestTemplate restTemplate = new RestTemplate();
+            transactionRepository.transactionCreate2WithToBankAccount(id,confirmCode);
+            String bankAccount = transactionRepository.findById(id)
+                    .orElseThrow(() -> new NotFoundException("Error"))
+                    .getBankAccount();
+//            restTemplate.put("",bankAccount);
             /*
              * Here we need to check bank number with General bank system !!!
              * If bank account confirm, we need to warn that bank ! ! !
              * */
-            transaction.setBankAccount(transaction.getBankAccount());
         }
         /*
          * If this transaction face to any exception, that transaction save failure.
          * Else this transaction save successfully!
          * */
-        transaction.setSuccess(true);
-        transactionRepository.save(transaction);
         return 1;
     }
     @Override
