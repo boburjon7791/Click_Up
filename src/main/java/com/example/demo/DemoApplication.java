@@ -3,6 +3,8 @@ package com.example.demo;
 import com.example.demo.configuration.MyApplicationListener;
 import com.example.demo.repositories.AuthUserRepository;
 import com.example.demo.service.MultimediaService;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.servers.Server;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
@@ -34,6 +36,7 @@ import java.util.TimeZone;
 @EnableAsync
 @EnableScheduling
 @SpringBootApplication
+@OpenAPIDefinition(servers = {@Server(url = "/", description = "Default Server URL")})
 @RequiredArgsConstructor
 public class DemoApplication {
 	private final MyApplicationListener myApplicationListener;
@@ -81,7 +84,7 @@ public class DemoApplication {
 				.version("1.0")
 				.contact(new Contact().name("Soliyev Boburjon")
 						.email("soliyevboburjon95@gmail.com")
-						.url("http://localhost:8080"))
+						.url("https://localhost:8080"))
 				.license(new License().name("License of API").url(myApplicationListener.hostName));
 	}
 	@Bean

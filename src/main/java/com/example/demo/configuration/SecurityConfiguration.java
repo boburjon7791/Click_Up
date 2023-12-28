@@ -1,5 +1,6 @@
 package com.example.demo.configuration;
 
+import com.example.demo.exceptions.UnauthorizedException;
 import com.example.demo.payloads.auth_user.ErrorDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -51,7 +52,6 @@ public class SecurityConfiguration {
     public AuthenticationEntryPoint entryPoint(){
         return (request, response, authException) -> {
             String requestURI = request.getRequestURI();
-            OutputStream outputStream = response.getOutputStream();
             String message = authException.getMessage();
             ErrorDto errorDto = ErrorDto.builder()
                     .code(401)
@@ -59,24 +59,22 @@ public class SecurityConfiguration {
                     .uri(requestURI)
                     .build();
             response.setStatus(errorDto.code);
-            objectMapper.writeValue(outputStream, errorDto);
-            outputStream.close();
+            String value = objectMapper.writeValueAsString(errorDto);
+            throw new UnauthorizedException(value);
         };
     }
     @Bean
     public AccessDeniedHandler accessDeniedHandler(){
         return (request, response, accessDeniedException) -> {
             String requestURI = request.getRequestURI();
-            OutputStream outputStream = response.getOutputStream();
             String message = accessDeniedException.getMessage();
             ErrorDto errorDto = ErrorDto.builder()
                     .uri(requestURI)
                     .code(403)
                     .message(message)
                     .build();
-            response.setStatus(errorDto.code);
-            objectMapper.writeValue(outputStream, errorDto);
-            outputStream.close();
+            String value = objectMapper.writeValueAsString(errorDto);
+            throw new UnauthorizedException(value);
         };
     }
     @Bean

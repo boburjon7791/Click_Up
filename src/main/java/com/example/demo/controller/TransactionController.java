@@ -19,7 +19,7 @@ import java.util.concurrent.CompletableFuture;
 @RestController
 @RequiredArgsConstructor
 @PreAuthorize("isAuthenticated()")
-@RequestMapping("/api.support-card-type")
+@RequestMapping("/api.transaction")
 public class TransactionController {
     private final TransactionService transactionService;
     @Async
