@@ -6,6 +6,7 @@ import com.example.demo.payloads.auth_user.ConfirmedUserDto;
 import com.example.demo.payloads.auth_user.Login;
 import com.example.demo.repositories.AuthUserRepository;
 import com.example.demo.service.AuthUserService;
+import com.example.demo.service.CustomUserDetails;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -60,9 +62,16 @@ public class AuthController {
         authUserService.logout(Long.parseLong(params.get("userId")),request,params.get("data"));
         return ResponseEntity.noContent().build();
     }
-    @GetMapping("/get/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping("/get-for-admin/{id}")
     public ResponseEntity<AuthUserGetDto> get(@PathVariable Long id){
         AuthUserGetDto getDto = authUserService.get(id);
+        return ResponseEntity.ok(getDto);
+    }
+    @GetMapping("/get")
+    public ResponseEntity<AuthUserGetDto> get(){
+        CustomUserDetails customUserDetails=(CustomUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        AuthUserGetDto getDto = authUserService.get(customUserDetails.authUser().getId());
         return ResponseEntity.ok(getDto);
     }
     @PostMapping("/create/confirmed-user")

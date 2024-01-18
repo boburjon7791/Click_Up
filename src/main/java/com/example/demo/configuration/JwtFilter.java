@@ -1,5 +1,6 @@
 package com.example.demo.configuration;
 
+import com.example.demo.service.CustomUserDetails;
 import com.example.demo.service.CustomUserDetailsService;
 import com.example.demo.utils.JwtTokenUtils;
 import jakarta.servlet.FilterChain;
@@ -45,8 +46,8 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
         String email = getEmail(authorization);
-        UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, null, userDetails.getAuthorities());
+        CustomUserDetails customUserDetails = customUserDetailsService.loadUserByUsername(email);
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
         WebAuthenticationDetails details = new WebAuthenticationDetails(request);
         log.info("details : "+details.getRemoteAddress());
         SecurityContext context = SecurityContextHolder.getContext();

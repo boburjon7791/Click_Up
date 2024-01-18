@@ -20,21 +20,11 @@ import java.util.stream.Collectors;
 public class CustomUserDetailsService implements UserDetailsService {
     private final AuthUserRepository authUserRepository;
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public CustomUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         if (username==null || username.isBlank()) {
-            return null;
+            throw new NotFoundException();
         }
         AuthUser authUser = authUserRepository.findByEmail(username).orElseThrow(NotFoundException::new);
-        Set<SimpleGrantedAuthority> authoritySet = authUser.getRoles().stream()
-                .map(role -> new SimpleGrantedAuthority(role.getName()))
-                .collect(Collectors.toSet());
-        return User.builder()
-                .accountLocked(authUser.getActive())
-                .username(authUser.getEmail())
-                .password(authUser.getPinCode().toString())
-                .authorities(authoritySet)
-                .accountExpired(authUser.getActive())
-                .credentialsExpired(authUser.getActive())
-                .build();
+        return new CustomUserDetails(authUser);
     }
 }
