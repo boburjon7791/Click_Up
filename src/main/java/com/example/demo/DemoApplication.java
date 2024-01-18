@@ -52,7 +52,7 @@ public class DemoApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(DemoApplication.class, args);
 	}
-	@Scheduled(cron = "0 0 * * * *")
+//	@Scheduled(cron = "0 0 * * * *")
 	public void images(){
 		RowMapper<String> rowMapper = BeanPropertyRowMapper.newInstance(String.class);
 		String sql = "select profile_image from auth_user";
